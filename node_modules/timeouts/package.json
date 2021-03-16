@@ -1,0 +1,28 @@
+{
+  "name": "timeouts",
+  "version": "0.0.1",
+  "description": "thin wrapper on setTimeout to keep track of and clear timeouts",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mvayngrib/timeouts.git"
+  },
+  "keywords": [
+    "timeout",
+    "setTimeout",
+    "timeout",
+    "manager"
+  ],
+  "author": "Mark Vayngrib <mark.vayngrib@lablz.com> (http://github.com/mvayngrib)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mvayngrib/timeouts/issues"
+  },
+  "homepage": "https://github.com/mvayngrib/timeouts#readme",
+  "devDependencies": {
+    "tape": "^4.0.0"
+  }
+}

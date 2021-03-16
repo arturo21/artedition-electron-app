@@ -1,0 +1,131 @@
+    <!DOCTYPE html>
+<html>
+<head>
+	<base href="/">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+	<meta http-equiv="Content-Security-Policy" content="">
+	<style type="text/css">
+		html,body {
+			margin: 0;
+			padding: 0;
+			height: 100% !important;
+			width: 100% !important;
+		}
+		#container {
+			position: relative;
+			height: 100% !important;
+			width: 100% !important;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+		}
+	</style>
+</head>
+<body>
+<div id="container"></div>
+<script src="static/js/axios.min.js"></script>
+<script type="text/javascript" src="https://microsoft.github.io/monaco-editor/node_modules/monaco-editor/min/vs/loader.js"></script>
+<script>
+let holder = document.querySelector('#container');
+let archivo=[];
+let reader = new FileReader();
+let texte="";
+let blob;
+let artEditor;
+let fileList;
+localStorage.setItem("contentfile", "");
+
+require.config({ paths: { 'vs': 'https://unpkg.com/monaco-editor@latest/min/vs' }});
+window.MonacoEnvironment = { getWorkerUrl: () => proxy };
+
+let proxy = URL.createObjectURL(new Blob([`
+	self.MonacoEnvironment = {
+		baseUrl: 'https://unpkg.com/monaco-editor@latest/min/'
+	};
+	importScripts('https://unpkg.com/monaco-editor@latest/min/vs/base/worker/workerMain.js');
+`], { type: 'text/javascript' }));
+require(["vs/editor/editor.main"], function () {
+	artEditor = monaco.editor.create(document.getElementById('container'), {
+		value: [
+			''
+		].join('\n'),
+		language: 'javascript',
+		theme: 'vs-dark',
+		automaticLayout: true
+	});
+});
+
+function saveMonVal() {
+	// get the value of the data
+	let valor=artEditor.getModel().getValue();
+}
+
+(function () {
+	guardararchivo = () => {
+		let valor=artEditor.getModel().getValue();
+		var myBlob = new Blob([valor], {type: 'text/plain'});
+		localStorage.contentfile = myBlob;
+		//lamada AJAX para guardar los datos via server express
+		console.log("AXIOS")
+		axios.post('/savefile', {
+			ruta: archivo.ruta,
+			texto: btoa(valor),
+			metodo: 'guardararchivo'
+		  })
+		  .then(function (response) {
+			console.log(response);
+		  })
+		  .catch(function (error) {
+			console.log(error);
+		  });
+	}
+    holder.ondragover = () => {
+        return false;
+    };
+    holder.ondragleave = () => {
+        return false;
+    };
+    holder.ondragend = () => {
+        return false;
+    };
+    holder.ondrop=(e) => {
+        e.preventDefault();
+		const container_text=document.querySelector("#container");
+		fileList = event.dataTransfer.files;
+		console.log("Lista de Archivos: ")
+		console.log(fileList[0]);
+        for (let f of e.dataTransfer.files) {
+            console.log('DATA: ');
+			console.log(f);
+			// Check for the various File API support.
+			if (window.File && window.FileReader && window.FileList && window.Blob) {
+				reader.onload = function(loadedEvent) {
+					archivo.ruta=fileList[0].path;
+					archivo.nombre=fileList[0].name;
+					artEditor.getModel().setValue(loadedEvent.target.result);
+				}
+				reader.readAsText(fileList[0],"UTF-8");
+				let error = reader.error;
+			}
+			else {
+			  alert('The File APIs are not fully supported in this browser.');
+			}
+        }
+        return false;
+    };
+
+	holder.onkeyup=(e) => {
+	    e = e || event;
+//     altKey: para la tecla alt
+//     shiftKey: para la tecla shift (mayúsculas)
+//     ctrlKey: para la tecla ctrl (en pc, creo que también funciona en apple con la tecla opt)
+		if (e.ctrlKey){
+			guardararchivo();
+		}
+    };
+})();
+</script>
+</body>
+</html>
+
