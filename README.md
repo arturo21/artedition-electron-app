@@ -8,7 +8,10 @@ Main Window (With Monaco Editor)
 ## Installing the editor
 
 ### First Alternative
+```
 git clone https://github.com/arturo21/artedition-electron-app.git
-
+```
 #### Execute
+```
 electron index.js --no-sandbox
+```
